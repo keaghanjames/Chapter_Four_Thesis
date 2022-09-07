@@ -9,4 +9,6 @@ Scripts associated with the production of Chapter Four, Global variation in the 
 
 Dufour_et_al_2019.csv contains migration trait data used to produce figures 6 and 7, 'functional_diversity_indicesFULL.csv'.
 
-'standerdised_effect_sizes.csv' includes for each site the mean phylogenetic diversity (PDn), mean mean pairwise distance (MPDn), mean pairwise functional distance (MPFD) and standard deviation (sd) for the simulated assemblages at each site. It also includes the empirical score for each of those indices (e) and the standerdised effect sizes of each (ses), as well as the species richness, latitude and longitude of each site. 
+standerdised_effect_sizes.csv includes for each site the mean phylogenetic diversity (PDn), mean mean pairwise distance (MPDn), mean pairwise functional distance (MPFD) and standard deviation (sd) for the simulated assemblages at each site. It also includes the empirical score for each of those indices (e) and the standerdised effect sizes of each (ses), as well as the species richness, latitude and longitude of each site. 
+
+functional_diversity_indicesFULL.csv includes the functional dispersion and principle coordinates of each site, as well as their phylogenetic diversity, mean pairwise distance and coordinates. 
