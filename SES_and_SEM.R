@@ -1,6 +1,5 @@
-## NULL ANALYSIS
-
-# NULL Hypothesis 
+#script for calculating standerdised effect sizes of PD and FD from distance-weighted null and undertaking structual equation analysis
+#the script also includes code for producing Figures 1-5 and Figures S1-S2.
 
 
 setwd("~/Dropbox/AVONET")
@@ -19,22 +18,12 @@ require(ggpubr)
 col <- c('#0A2342', '#0B7A75', '#FA8334', '#7B2D26', '#9593D9')
 colours <- c('#340068', 'darkgrey', '#FE5D26')
 
+#############################################
+### Calculating Standerdised Effect Sizes ###
+#############################################
 setwd("D_NULL")
-
-# df_null <- readRDS('summary_run1.rds')
-# 
-# for(i in 2:999){
-#   df_null <- bind_rows(df_null, readRDS(paste0('summary_run', i, '.rds')))
-#   print(i)
-# }
-# tail(df_null)
-# 
-# saveRDS(df_null, 'full_null.rds')
 df_null <- readRDS('full_null.rds')
-
-
 df_emp <- read.csv('~/Dropbox/AVONET/ses_empircal.csv')
-
 
 #we need to get the mean of each indicator index for each site
 df_null$site <- as.factor(df_null$site)
@@ -106,7 +95,6 @@ p0.1 <- ggplot(df, aes(x = PDses, y = MPFDses, col = abs_lat)) +
 
 p0.1 + facet_wrap(~ lat_cat, nrow = 4)
 
-#ggsave('sesPD_sesMFPD.pdf', scale = 0.8)
 
 
 #now we are going to look at the strength of the correlation between our variables
@@ -133,7 +121,6 @@ df_cor <- df_null %>%
             MPD_SR = cor(MPD, sp_richn), 
             MPFD_SR = cor(MPFD, sp_richn))
 df_cor
-#write.csv(df_cor, 'simulated_correlations.csv', row.names = F)  
 
 require(ggplot2)
 p1 <- ggplot(df_cor, aes(x = MPD_MPFD))+
@@ -154,10 +141,6 @@ p1 + geom_vline(
 
 hist(df_cor$MPD_MPFD, xlim = c(0, 0.16))
 abline(v = cor(df_emp$mpd, df_emp$MPFD))
-# you should subset by absolute latitude
-
-
-
 
 
 df_cor_long <- df_null %>%
@@ -202,10 +185,9 @@ p2 <- p2 + geom_vline(
   linetype="dashed", alpha = 0.7
 ) + scale_color_manual(values = rev(colours))
 p2
-#ggsave('corPD_MFPD.pdf', scale = 0.8)
 
 
-#cor MPD and MFPD
+#correlation of MPD and MFPD
 p2.1 <- ggplot(df_cor_long, aes(x = MPD_MPFD, y = long_cats, fill = long_cats))+
  # geom_vline(xintercept = 0, linetype = 'dotted') +
   geom_density_ridges(aes(scale = 7), alpha = 0.7) + 
@@ -230,7 +212,6 @@ p2.1 <- p2.1 + geom_vline(
   linetype="dashed"
 ) + scale_color_manual(values = colours)
 p2.1
-#ggsave('corMPD_MFPD.pdf', scale = 0.8)
 
 dev.off()
 p1.slopes <- ggplot(data = df_cor_long, aes(line = lat_cat))+
@@ -255,7 +236,6 @@ col_plot <- ggarrange(p2, p2.1,
                        widths = c(2,2), nrow = 1, ncol = 2)
 col_plot
 
-#ggsave('simulated_correlations.pdf', plot = col_plot, device = 'pdf')
 
 world <- map_data("world")
 
@@ -276,12 +256,9 @@ library(ggthemes)
 world_map = map_data("world") %>% 
   filter(! long > 180)
 
-#colours <- c(rgb(74,150,236, maxColorValue = 255), rgb(231,239,242, maxColorValue = 255), rgb(241,166,127, maxColorValue = 255))
 colours <- c('#340068', rgb(235,221,255, maxColorValue = 255), '#FE5D26')
-
 colour_breaks <- c(-8, 0, 8)
-#scale_color_gradient(low = '#FE5D26', high = '#340068') + 
-#colours[c(1,3)] <- c('#340068', '#FE5D26')
+
 
 mapPDses <- 
   ggplot() +
@@ -320,7 +297,6 @@ mapPD <-
   geom_hline(yintercept = 0, linetype="dashed", size = .2)+
   theme(legend.position = "none")     +
   ggtitle('PD')     
-#scale_color_viridis(alpha = 0.3, option = 'D', limits = c(-7, 7))
 mapPD
 
 df$long_cats <- df_emp$long_cats
@@ -345,7 +321,6 @@ cor_SR_PDses <-
   )+
   theme_classic() +
   geom_hline(yintercept = 0, linetype = 'dashed', size = 0.2)+
-#  theme(legend.position = "none")+
   xlab('Species richness') +
   ylab(element_blank())+
   ylim(c(-10,10))
@@ -598,8 +573,10 @@ grid_plot1 <- ggarrange(mapFD, cor_SR_FD,
 grid_plot1
 ggsave(plot = grid_plot1, filename = 'FDPDmaps_and_dists.pdf', device = 'pdf')
 
-#statistical analysis of SES 
 
+####################################
+### Structual Equation Modelling ###
+####################################
 require(lavaan)
 
 df_standardise <- df[c(13,15:18)]
@@ -633,9 +610,6 @@ p8 <- ggplot(data = df_emp, aes(y = fdis, x = pd, col = abs_lat)) +
 p8 + facet_wrap(~ lat_cat)
 
 
-
-### SEM with SES
-
 require(sesem)
 require(fields)
 require(jtools)
@@ -659,7 +633,6 @@ data$PDses_int_abs_lat <- data$PDses*data$abs_lat
 data$sp_richn2 <- data$sp_richn^2
 head(data)
 data <- standardize(data, vars = colnames(data)[3:9])
-
 
 
 system.time(covariances <- make.covar(data, distance_matrix, binsize, binname))
@@ -790,7 +763,9 @@ p1g1 <- ggarrange(p1, g1, nrow = 1, widths = c(3,1), labels = c('b', ''))
 p1g1
 ggsave(p1g1, filename = 'continental_coef_int_slope_ses.pdf', device = 'pdf', width = 12, height =4)
 
-### Southern v Northern
+#######################################
+### Southern v Northern Hempisphere ###
+#######################################
 
 fit1.North <- cfa(model1, data = subset(data, lat >= 0), estimator = 'MLM', se = 'robust')
 summary(fit1.North, standardized = T)
