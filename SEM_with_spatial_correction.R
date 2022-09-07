@@ -1,3 +1,5 @@
+#this code implements the structual equation models but includes versions which correct for spatial autocorrelation
+
 
 library(lavaan)
 library(semPlot)
@@ -633,31 +635,6 @@ ggsave('FD_PD_Lat.pdf', height = 5, width = 6)
 require(sesem)
 require(fields)
 distance_matrix <- round(rdist.earth(x1 = functional_indices[,5:6], miles = F)[lower.tri(matrix(nrow = nrow(functional_indices), ncol = nrow(functional_indices)), diag=T)])
-#we have to do some fuckery to get this into the same format as what the calc.dist function produces
-#we can't simply use calc.dist because it is insanely inefficient
-#diag(distance_matrix) <- 0
-# distance_matrix <- matrix(distance_matrix, nrow = nrow(functional_indices), byrow = T)
-# head(distance_matrix)[,1:10]
-# #distance.calc <- vector()
-# 
-# con_distance_matrix <- function(distance_col){
-#   distance.calc <- distance_col[which(distance_col == 0):length(distance_col)]
-#   return(distance.calc)
-# }
-# 
-# 
-# distance_matrix <- apply(distance_matrix, 2, con_distance_matrix)
-# distance_matrix <- unlist(distance_matrix)
-
-#m1
-
-#)
-# for(i in 1:ncol(distance_matrix)){
-#   distance.calc <- c(distance.calc,   distance_matrix[which(distance_matrix[,i] == 0):nrow(distance_matrix), i])
-# }
-
-
-#ddistance_matrix <- calc.dist(functional_indices[1:100,5:6])
 system.time(bins<-make.bin(distance_matrix,type='n.bins',p.dist=10, n.bins = 3))
 binsize<-bins[1][[1]] #truelove lowland bin sizes
 binname<-bins[2][[1]] #truelove lowland bin names
